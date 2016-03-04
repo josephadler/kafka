@@ -21,6 +21,9 @@ ec2_instance_type = "m3.medium"
 num_zookeepers = 0
 num_brokers = 0
 num_workers = 9
+num_connect_workers = 0
+connect_group_id = "connect-test-group"
+
 ec2_keypair_name = kafkatest
 ec2_keypair_file = ../kafkatest.pem
 ec2_security_groups = ['kafkatest']
