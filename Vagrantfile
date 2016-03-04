@@ -25,9 +25,11 @@ enable_dns = false
 enable_jmx = false
 num_zookeepers = 1
 num_brokers = 3
+num_connect_workers = 0 # Kafka Connect cluster workers
 num_workers = 0 # Generic workers that get the code, but don't start any services
 ram_megabytes = 1280
 base_box = "ubuntu/trusty64"
+connect_group_id = "test-connect-group"
 
 # EC2
 ec2_access_key = ENV['AWS_ACCESS_KEY']
@@ -162,8 +164,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     end
   }
 
+  brokers = []
   (1..num_brokers).each { |i|
     name = "broker" + i.to_s
+    brokers.push(name)
     config.vm.define name do |broker|
       name_node(broker, name, ec2_instance_name_prefix)
       ip_address = "192.168.50." + (50 + i).to_s
@@ -186,6 +190,18 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       ip_address = "192.168.50." + (100 + i).to_s
       assign_local_ip(worker, ip_address)
       worker.vm.provision "shell", path: "vagrant/base.sh"
+    end
+  }
+
+  (1..num_connect_workers).each { |i|
+    name = "connect_worker" + i.to_s
+    config.vm.define name do |connect_worker|
+      name_node(connect_worker, name, ec2_instance_name_prefix)
+      ip_address = "192.168.50." + (150 + i).to_s
+      assign_local_ip(connect_worker, ip_address)
+      brokers_bootstrap = brokers.map{ |broker_addr| broker_addr + ":9092"}.join(",")
+      connect_worker.vm.provision "shell", path: "vagrant/base.sh"
+      connect_worker.vm.provision "shell", path: "vagrant/connect-worker.sh", args => [connect_group_id, brokers_bootstrap]
     end
   }
 

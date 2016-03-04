@@ -20,16 +20,36 @@
 # or bring up your mini Kafka cluster.
 
 # Install dependencies
-sudo apt-get install -y maven openjdk-6-jdk build-essential \
+
+# make sure we get the most recent gradle
+sudo add-apt-repository ppa:cwchien/gradle
+
+## old version with jdk 6
+#sudo apt-get install -y maven openjdk-6-jdk build-essential \
+#            ruby-dev zlib1g-dev realpath python-setuptools
+
+## new with jdk 7
+#sudo apt-get install -y maven openjdk-7-jdk build-essential \
+#            ruby-dev zlib1g-dev realpath python-setuptools
+
+# for oracle jdk 8
+echo debconf shared/accepted-oracle-license-v1-1 select true | sudo debconf-set-selections
+echo debconf shared/accepted-oracle-license-v1-1 seen true | sudo debconf-set-selections
+sudo add-apt-repository ppa:webupd8team/java -y
+sudo apt-key adv --recv-keys --keyserver keyserver.ubuntu.com 0xEEA14886
+sudo apt-get update
+sudo apt-get install -y maven oracle-java8-installer build-essential \
             ruby-dev zlib1g-dev realpath python-setuptools
+
 
 base_dir=`dirname $0`/../..
 
 if [ -z `which vagrant` ]; then
     echo "Installing vagrant..."
-    wget https://dl.bintray.com/mitchellh/vagrant/vagrant_1.7.2_x86_64.deb
-    sudo dpkg -i vagrant_1.7.2_x86_64.deb
-    rm -f vagrant_1.7.2_x86_64.deb
+#    wget https://dl.bintray.com/mitchellh/vagrant/vagrant_1.7.2_x86_64.deb
+    wget https://releases.hashicorp.com/vagrant/1.8.1/vagrant_1.8.1_x86_64.deb
+    sudo dpkg -i vagrant_1.8.1_x86_64.deb
+    rm -f vagrant_1.8.1_x86_64.deb
 fi
 
 # Install necessary vagrant plugins
