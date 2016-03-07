@@ -28,7 +28,7 @@ cd $kafka_dir
 sed \
     -e 's/group.id=connect-cluster/'group.id=$GROUP_ID'/' \
     -e 's/bootstrap.servers=localhost:2181/'bootstrap.servers=$BROKER_ADDRESSES'/' \
-    $kafka_dir/config/connnect-distributed.properties > $kafka_dir/config/worker-$GROUP_ID.properties
+    $kafka_dir/config/connect-distributed.properties > $kafka_dir/config/connect-worker-$GROUP_ID.properties
 
 #echo "Killing server"
 #bin/kafka-server-stop.sh || true
@@ -39,4 +39,4 @@ sed \
 #  export KAFKA_JMX_OPTS="-Djava.rmi.server.hostname=$PUBLIC_ADDRESS -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false  -Dcom.sun.management.jmxremote.ssl=false "
 #fi
 #bin/kafka-server-start.sh $kafka_dir/config/server-$BROKER_ID.properties 1>> /tmp/broker.log 2>> /tmp/broker.log &
-bin/connect-distributed $kafka_dir/config/worker-$WORKER_ID.properties 1>> /tmp/worker.log 2>> /tmp/worker.log &
+bin/connect-distributed $kafka_dir/config/connect-worker-$GROUP_ID.properties 1>> /tmp/worker.log 2>> /tmp/worker.log &

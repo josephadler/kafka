@@ -26,6 +26,11 @@ connect_group_id = "connect-test-group"
 
 ec2_keypair_name = kafkatest
 ec2_keypair_file = ../kafkatest.pem
-ec2_security_groups = ['kafkatest']
 ec2_region = 'us-west-2'
 ec2_ami = "ami-29ebb519"
+# Use security group id, not name
+ec2_security_groups = ['kafkatest']
+# Use subnet id for vpc
+ec2_subnet_id = ""
+# also need to specify...
+enable_dns = true

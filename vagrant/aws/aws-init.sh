@@ -39,7 +39,7 @@ sudo add-apt-repository ppa:webupd8team/java -y
 sudo apt-key adv --recv-keys --keyserver keyserver.ubuntu.com 0xEEA14886
 sudo apt-get update
 sudo apt-get install -y maven oracle-java8-installer build-essential \
-            ruby-dev zlib1g-dev realpath python-setuptools
+            ruby-dev zlib1g-dev realpath python-setuptools gradle
 
 
 base_dir=`dirname $0`/../..
@@ -66,18 +66,20 @@ done
 
 # Create Vagrantfile.local as a convenience
 if [ ! -e "$base_dir/Vagrantfile.local" ]; then
-    cp $base_dir/aws/aws-example-Vagrantfile.local $base_dir/Vagrantfile.local
+    cp $base_dir/vagrant/aws/aws-example-Vagrantfile.local $base_dir/Vagrantfile.local
 fi
 
-gradle="gradle-2.2.1"
-if [ -z `which gradle` ] && [ ! -d $base_dir/$gradle ]; then
-    if [ ! -e $gradle-bin.zip ]; then
-        wget https://services.gradle.org/distributions/$gradle-bin.zip
-    fi
-    unzip $gradle-bin.zip
-    rm -rf $gradle-bin.zip
-    mv $gradle $base_dir/$gradle
-fi
+
+# not needed if we add the right gradle repo above
+#gradle="gradle-2.2.1"
+#if [ -z `which gradle` ] && [ ! -d $base_dir/$gradle ]; then
+#    if [ ! -e $gradle-bin.zip ]; then
+#        wget https://services.gradle.org/distributions/$gradle-bin.zip
+#    fi
+#    unzip $gradle-bin.zip
+#    rm -rf $gradle-bin.zip
+#    mv $gradle $base_dir/$gradle
+#fi
 
 # Ensure aws access keys are in the environment when we use a EC2 driver machine
 LOCAL_HOSTNAME=$(hostname -d)

@@ -194,14 +194,15 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   }
 
   (1..num_connect_workers).each { |i|
-    name = "connect_worker" + i.to_s
-    config.vm.define name do |connect_worker|
-      name_node(connect_worker, name, ec2_instance_name_prefix)
+    name = "connectworker" + i.to_s
+    config.vm.define name do |connectworker|
+      name_node(connectworker, name, ec2_instance_name_prefix)
       ip_address = "192.168.50." + (150 + i).to_s
-      assign_local_ip(connect_worker, ip_address)
+      assign_local_ip(connectworker, ip_address)
       brokers_bootstrap = brokers.map{ |broker_addr| broker_addr + ":9092"}.join(",")
-      connect_worker.vm.provision "shell", path: "vagrant/base.sh"
-      connect_worker.vm.provision "shell", path: "vagrant/connect-worker.sh", args => [connect_group_id, brokers_bootstrap]
+      connectworker.vm.provision "shell", path: "vagrant/base.sh"
+      connectworker.vm.provision "shell", path: "vagrant/connect-worker.sh", :args => [connect_group_id, brokers_bootstrap]
+      connectworker.vm.provision "shell", path: "vagrant/connect-worker.sh", :args => [connect_group_id, brokers_bootstrap]
     end
   }
 
