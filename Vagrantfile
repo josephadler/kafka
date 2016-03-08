@@ -202,7 +202,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       brokers_bootstrap = brokers.map{ |broker_addr| broker_addr + ":9092"}.join(",")
       connectworker.vm.provision "shell", path: "vagrant/base.sh"
       connectworker.vm.provision "shell", path: "vagrant/connect-worker.sh", :args => [connect_group_id, brokers_bootstrap]
-      connectworker.vm.provision "shell", path: "vagrant/connect-worker.sh", :args => [connect_group_id, brokers_bootstrap]
     end
   }
 
