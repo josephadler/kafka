@@ -132,6 +132,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       aws.associate_public_ip = ec2_associate_public_ip
     end
 
+    # add more storage
+    broker.block_device_mapping = [{ 'DeviceName' => '/dev/xvda1', 'Ebs.VolumeSize' => 80 }]
+
     # Exclude some directories that can grow very large from syncing
     override.vm.synced_folder ".", "/vagrant", type: "rsync", :rsync_excludes => ['.git', 'core/data/', 'logs/', 'tests/results/', 'results/']
   end
@@ -169,8 +172,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     name = "broker" + i.to_s
     brokers.push(name)
     config.vm.define name do |broker|
-      # add more storage for brokers
-      broker.block_device_mapping = [{ 'DeviceName' => '/dev/xvda1', 'Ebs.VolumeSize' => 80 }]
       name_node(broker, name, ec2_instance_name_prefix)
       ip_address = "192.168.50." + (50 + i).to_s
       assign_local_ip(broker, ip_address)
