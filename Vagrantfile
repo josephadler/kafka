@@ -169,6 +169,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     name = "broker" + i.to_s
     brokers.push(name)
     config.vm.define name do |broker|
+      # add more storage for brokers
+      broker.block_device_mapping = [{ 'DeviceName' => '/dev/xvda1', 'Ebs.VolumeSize' => 80 }]
       name_node(broker, name, ec2_instance_name_prefix)
       ip_address = "192.168.50." + (50 + i).to_s
       assign_local_ip(broker, ip_address)
