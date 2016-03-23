@@ -22,6 +22,17 @@ set -e
 GROUP_ID=$1
 BROKER_ADDRESSES=$2
 
+sudo apt-get -y install git maven
+mvn install:install-file -Dfile=/opt/kakfa-trunk/core/build/libs/kafka_2.11-0.10.0.0-SNAPSHOT.jar \
+ -DgroupId=org.apache.kafka -DartifactId=kafka_2.11 -Dversion=0.10.0.0-SNAPSHOT -Dpackaging=jar
+mvn install:install-file -Dfile=/opt/kakfa-trunk/clients/build/libs/kafka-clients-0.10.0.0-SNAPSHOT.jar \
+ -DgroupId=org.apache.kafka -DartifactId=kafka-clients -Dversion=0.10.0.0-SNAPSHOT -Dpackaging=jar
+mvn install:install-file -Dfile=/opt/kakfa-trunk/clients/build/libs/kafka-connect-0.10.0.0-SNAPSHOT.jar \
+ -DgroupId=org.apache.kafka -DartifactId=kafka-connect -Dversion=0.10.0.0-SNAPSHOT -Dpackaging=jar
+git clone https://github.com/confluentinc/common.git
+git clone https://github.com/confluentinc/rest-utils.git
+git clone https://github.com/confluentinc/schema-registry.git
+
 kafka_dir=/opt/kafka-trunk
 cd $kafka_dir
 

@@ -203,6 +203,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       ip_address = "192.168.50." + (150 + i).to_s
       assign_local_ip(connectworker, ip_address)
       brokers_bootstrap = brokers.map{ |broker_addr| broker_addr + ":9092"}.join(",")
+      connectworker.vm.provision "file", path: ""
       connectworker.vm.provision "shell", path: "vagrant/base.sh"
       connectworker.vm.provision "shell", path: "vagrant/connect-worker.sh", :args => [connect_group_id, brokers_bootstrap]
     end
