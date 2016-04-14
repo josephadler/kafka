@@ -43,6 +43,8 @@ public class StreamTask extends AbstractTask implements Punctuator {
 
     private static final Logger log = LoggerFactory.getLogger(StreamTask.class);
 
+    private static final ConsumerRecord<Object, Object> DUMMY_RECORD = new ConsumerRecord<>(ProcessorContextImpl.NONEXIST_TOPIC, -1, -1L, null, null);
+
     private final int maxBufferedSize;
 
     private final PartitionGroup partitionGroup;
@@ -202,24 +204,30 @@ public class StreamTask extends AbstractTask implements Punctuator {
 
     /**
      * Possibly trigger registered punctuation functions if
-     * current time has reached the defined stamp
-     *
-     * @param timestamp
+     * current partition group timestamp has reached the defined stamp
      */
-    public boolean maybePunctuate(long timestamp) {
+    public boolean maybePunctuate() {
+        long timestamp = partitionGroup.timestamp();
+
         return punctuationQueue.mayPunctuate(timestamp, this);
     }
 
+    /**
+     * @throws IllegalStateException if the current node is not null
+     */
     @Override
     public void punctuate(ProcessorNode node, long timestamp) {
         if (currNode != null)
             throw new IllegalStateException("Current node is not null");
 
         currNode = node;
+        currRecord = new StampedRecord(DUMMY_RECORD, timestamp);
+
         try {
             node.processor().punctuate(timestamp);
         } finally {
             currNode = null;
+            currRecord = null;
         }
     }
 
@@ -275,6 +283,7 @@ public class StreamTask extends AbstractTask implements Punctuator {
      * Schedules a punctuation for the processor
      *
      * @param interval  the interval in milliseconds
+     * @throws IllegalStateException if the current node is not null
      */
     public void schedule(long interval) {
         if (currNode == null)
@@ -283,6 +292,9 @@ public class StreamTask extends AbstractTask implements Punctuator {
         punctuationQueue.schedule(new PunctuationSchedule(currNode, interval));
     }
 
+    /**
+     * @throws RuntimeException if an error happens during closing of processor nodes
+     */
     @Override
     public void close() {
         this.partitionGroup.close();
@@ -339,6 +351,22 @@ public class StreamTask extends AbstractTask implements Punctuator {
             childNode.process(key, value);
         } finally {
             currNode = thisNode;
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public <K, V> void forward(K key, V value, String childName) {
+        ProcessorNode thisNode = currNode;
+        for (ProcessorNode childNode : (List<ProcessorNode<K, V>>) thisNode.children()) {
+            if (childNode.name().equals(childName)) {
+                currNode = childNode;
+                try {
+                    childNode.process(key, value);
+                } finally {
+                    currNode = thisNode;
+                }
+                break;
+            }
         }
     }
 
