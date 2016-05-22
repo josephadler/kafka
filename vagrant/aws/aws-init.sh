@@ -46,10 +46,16 @@ base_dir=`dirname $0`/../..
 
 if [ -z `which vagrant` ]; then
     echo "Installing vagrant..."
+<<<<<<< HEAD
 #    wget https://dl.bintray.com/mitchellh/vagrant/vagrant_1.7.2_x86_64.deb
     wget https://releases.hashicorp.com/vagrant/1.8.1/vagrant_1.8.1_x86_64.deb
     sudo dpkg -i vagrant_1.8.1_x86_64.deb
     rm -f vagrant_1.8.1_x86_64.deb
+=======
+    wget https://releases.hashicorp.com/vagrant/1.7.2/vagrant_1.7.2_x86_64.deb
+    sudo dpkg -i vagrant_1.7.2_x86_64.deb
+    rm -f vagrant_1.7.2_x86_64.deb
+>>>>>>> 9a3fcf41350ddda9a41db18cde718f892b95177c
 fi
 
 # Install necessary vagrant plugins
@@ -92,4 +98,3 @@ if [[ ${LOCAL_HOSTNAME} =~ .*\.compute\.internal ]]; then
     source ~/.bashrc
   fi
 fi
-

@@ -441,10 +441,6 @@ project(':core') {
     duplicatesStrategy 'exclude'
   }
 
-  systemTestLibs {
-    dependsOn testJar
-  }
-
   task genProtocolErrorDocs(type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
     main = 'org.apache.kafka.common.protocol.Errors'
@@ -525,7 +521,7 @@ project(':core') {
   }
 
   jar {
-    dependsOn('copyDependantLibs', 'copyDependantTestLibs')
+    dependsOn('copyDependantLibs')
   }
 
   jar.manifest {
@@ -541,6 +537,8 @@ project(':core') {
     into "$buildDir/dependant-testlibs"
     duplicatesStrategy 'exclude'
   }
+
+  systemTestLibs.dependsOn('jar', 'testJar', 'copyDependantTestLibs')
 
   checkstyle {
     configProperties = [importControlFile: "$rootDir/checkstyle/import-control-core.xml"]

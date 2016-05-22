@@ -120,7 +120,7 @@ public class StreamsConfig extends AbstractConfig {
                                         Importance.HIGH,
                                         StreamsConfig.APPLICATION_ID_DOC)
                                 .define(BOOTSTRAP_SERVERS_CONFIG,       // required with no default value
-                                        Type.STRING,
+                                        Type.LIST,
                                         Importance.HIGH,
                                         CommonClientConfigs.BOOSTRAP_SERVERS_DOC)
                                 .define(CLIENT_ID_CONFIG,
@@ -300,11 +300,17 @@ public class StreamsConfig extends AbstractConfig {
     }
 
     public Serde keySerde() {
-        return getConfiguredInstance(StreamsConfig.KEY_SERDE_CLASS_CONFIG, Serde.class);
+        Serde<?> serde = getConfiguredInstance(StreamsConfig.KEY_SERDE_CLASS_CONFIG, Serde.class);
+        serde.configure(originals(), true);
+
+        return serde;
     }
 
     public Serde valueSerde() {
-        return getConfiguredInstance(StreamsConfig.VALUE_SERDE_CLASS_CONFIG, Serde.class);
+        Serde<?> serde = getConfiguredInstance(StreamsConfig.VALUE_SERDE_CLASS_CONFIG, Serde.class);
+        serde.configure(originals(), false);
+
+        return serde;
     }
 
     public static void main(String[] args) {
