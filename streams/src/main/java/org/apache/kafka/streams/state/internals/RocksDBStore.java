@@ -17,6 +17,7 @@
 
 package org.apache.kafka.streams.state.internals;
 
+import org.apache.kafka.common.errors.InterruptException;
 import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.utils.Bytes;
 import org.apache.kafka.streams.KeyValue;
@@ -38,6 +39,7 @@ import org.rocksdb.RocksDBException;
 import org.rocksdb.RocksIterator;
 import org.rocksdb.WriteBatch;
 import org.rocksdb.WriteOptions;
+import org.slf4j.Logger;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -99,7 +101,6 @@ public class RocksDBStore<K, V> implements KeyValueStore<K, V> {
 
     public KeyValueStore<K, V> enableLogging() {
         loggingEnabled = true;
-
         return this;
     }
 
@@ -111,6 +112,8 @@ public class RocksDBStore<K, V> implements KeyValueStore<K, V> {
 
     public RocksDBStore(String name, Serde<K> keySerde, Serde<V> valueSerde) {
         this(name, DB_FILE_DIR, keySerde, valueSerde);
+        dbStatsReporter = new DBStatsReporter();
+        dbStatsReporter.run();
     }
 
     public RocksDBStore(String name, String parentDir, Serde<K> keySerde, Serde<V> valueSerde) {
@@ -138,7 +141,30 @@ public class RocksDBStore<K, V> implements KeyValueStore<K, V> {
 
         fOptions = new FlushOptions();
         fOptions.setWaitForFlush(true);
+
+        dbStatsReporter = new DBStatsReporter();
+        dbStatsReporter.run();
+
     }
+
+    org.apache.log4j.Logger l = org.apache.log4j.Logger.getLogger(this.getClass());
+    private class DBStatsReporter extends Thread {
+        public void run() {
+            try {
+                while (true) {
+                    if (db != null) {
+                        l.debug(db.getProperty("rocksdb.num-entries-active-mem-table"));
+                    }
+                    sleep(60000);
+                }
+            } catch (Exception e) {
+                    l.debug(e);
+            }
+        }
+    }
+
+    private DBStatsReporter dbStatsReporter;
+
 
     private class RocksDBCacheEntry {
         public V value;
